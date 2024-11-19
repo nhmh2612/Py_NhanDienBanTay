@@ -11,11 +11,17 @@ DATA_DIR = './data'  # Đường dẫn chứa dữ liệu
 data = []
 labels = []
 
+# Kiểm tra và lưu lại các đặc trưng của bàn tay với chiều dài đồng nhất
 for dir_ in os.listdir(DATA_DIR):
     dir_path = os.path.join(DATA_DIR, dir_)
     if os.path.isdir(dir_path):
         for img_path in os.listdir(dir_path):
             img = cv2.imread(os.path.join(dir_path, img_path))
+
+            # Kiểm tra nếu ảnh được đọc thành công
+            if img is None:
+                continue
+
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             results = hands.process(img_rgb)
 
@@ -31,14 +37,17 @@ for dir_ in os.listdir(DATA_DIR):
                         x_.append(x)
                         y_.append(y)
 
+                    # Chuẩn hóa đặc trưng của từng điểm
                     for i in range(len(hand_landmarks.landmark)):
                         data_aux.append(hand_landmarks.landmark[i].x - min(x_))
                         data_aux.append(hand_landmarks.landmark[i].y - min(y_))
 
-                data.append(data_aux)
-                labels.append(dir_)
+                # Nếu số lượng đặc trưng là đủ, mới thêm vào danh sách
+                if len(data_aux) == 42:  
+                    data.append(data_aux)
+                    labels.append(dir_)
 
-# Lưu dữ liệu vào tệp
+# Lưu dữ liệu vào tệp pickle
 with open('data.pickle', 'wb') as f:
     pickle.dump({'data': data, 'labels': labels}, f)
 
