@@ -1,13 +1,13 @@
 import os
 import cv2
-
 # Thư mục lưu dữ liệu
 DATA_DIR = './data'
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
 # Danh sách các chữ cái cần thu thập dữ liệu
-letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+letters = list("2")
+
 dataset_size = 100  # Số lượng ảnh cho mỗi chữ cái
 
 cap = cv2.VideoCapture(0)  # Sử dụng webcam mặc định
@@ -26,7 +26,7 @@ for letter in letters:
     while True:
         ret, frame = cap.read()
         cv2.putText(frame, f'Ready to collect "{letter}"? Press "Q" to start!', (50, 50),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow('frame', frame)
 
         if cv2.waitKey(25) == ord('q'):
@@ -39,7 +39,7 @@ for letter in letters:
 
         # Hiển thị ảnh thu được và nhắc nhở số lượng ảnh đã thu thập
         cv2.putText(frame, f'Collecting "{letter}" - Image {counter + 1}/{dataset_size}',
-                    (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow('frame', frame)
 
         # Lưu ảnh vào thư mục tương ứng
@@ -49,6 +49,16 @@ for letter in letters:
         cv2.waitKey(100)  # Đợi 100ms (điều chỉnh thời gian nếu cần)
 
         counter += 1
+
+        # Dừng lại sau khi thu thập được 50 ảnh và yêu cầu nhấn "E" để tiếp tục
+        if counter == 50:
+            while True:
+                cv2.putText(frame, 'Press "E" to continue collecting', (50, 100),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                cv2.imshow('frame', frame)
+
+                if cv2.waitKey(25) == ord('e'):
+                    break
 
 cap.release()
 cv2.destroyAllWindows()
